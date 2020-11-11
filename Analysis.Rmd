@@ -1,0 +1,24 @@
+---
+title: "Analysis"
+author: "Duncan Gates"
+date: "11/11/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+consumerKey = "2UBwrhKMuLRvKxBw1dwCfJfs2"  
+consumerSecret = "dWnVwl593uB9RyJsCScCRePY6yv6Ogs6lfSqguGOLGcEgiEl3X"
+accessToken = "1231894513439756289-miuF5QtVJ3o1sQXHMdTElx7UuldNKk"
+accessSecret = "0afZHGFHvGER56QNVxjZK4jSkEgefpmghS79RGf3Pm4Ka"
+options(httr_oauth_cache=TRUE)
+setup_twitter_oauth(consumer_key = consumerKey, consumer_secret = consumerSecret,
+                    access_token = accessToken, access_secret = accessSecret)
+```
+
+## Scraping the data
+
+```{r}
+
+```
+
