@@ -1,0 +1,67 @@
+---
+title: "66daysofdata"
+author: "Duncan Gates"
+date: "11/13/2020"
+output: github_document
+---
+
+```{r, include = F}
+library(rtweet)
+library(igraph)
+library(hrbrthemes)
+library(ggraph)
+library(wordcloud2)
+library(tidyverse)
+library(twitteR)
+library(qdapRegex)
+library(tm)
+```
+
+
+## Tweets over Time
+
+Unfortunately the Twitter API limits scraping to just the last week, but there are a total of 743 engagements over the last week (including retweets, 319 engagements). Assuming a similar engagement rate over the previous 59 days we get about ~6000 total tweets including retweets, or ~2700 not including!
+
+```{r, echo = F}
+daysofdata <- search_tweets("#66DaysOfData", n = 5000, retryonratelimit = T, include_rts = T)
+## search for 18000 tweets using the rstats hashtag
+daysofdata %>% count(day = lubridate::floor_date(created_at, "day")) %>%
+  ggplot(aes(day, n)) +
+  geom_line() +
+  labs(title = "#66DaysOfData tweets per day, 2020",
+       caption = "source: Twitter Analytics, retrieved 2020-11-13", y = "Number of Tweets", x = "Week") +
+  hrbrthemes::theme_ipsum_ps()
+```
+
+## Wordcloud of Data
+
+![](/Users/dunk/Downloads/66daysofdata.png)
+
+
+## User Retweet Network
+
+Basic network that labels the screen names of the most retweets over the #66daysofdata hashtag.
+
+```{r, echo = F, message=F}
+## create from-to data frame representing retweet/mention/reply connections
+
+filter(daysofdata, retweet_count > 0) %>% 
+  select(screen_name, mentions_screen_name) %>%
+  unnest(mentions_screen_name) %>% 
+  filter(!is.na(mentions_screen_name)) %>% 
+  graph_from_data_frame() -> rt_g
+V(rt_g)$node_label <- unname(ifelse(degree(rt_g)[V(rt_g)] > 20, names(V(rt_g)), "")) 
+V(rt_g)$node_size <- unname(ifelse(degree(rt_g)[V(rt_g)] > 20, degree(rt_g), 0)) 
+
+ggraph(rt_g, layout = 'linear', circular = TRUE) + 
+  geom_edge_arc(edge_width=0.125, aes(alpha=..index..)) +
+  geom_node_label(aes(label=node_label, size=node_size),
+                  label.size=0, fill="#ffffff66", segment.colour="springgreen",
+                  color="slateblue", repel=TRUE, family=font_rc, fontface="bold") +
+  coord_fixed() +
+  scale_size_area(trans="sqrt") +
+  labs(title="Retweet Relationships", subtitle="Most retweeted screen names labeled. Darkers edges == more retweets. Node size == larger degree") +
+  theme_graph(base_family=font_rc) +
+  theme(legend.position="none")
+```
+

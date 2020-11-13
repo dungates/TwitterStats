@@ -5,20 +5,115 @@ date: "11/11/2020"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-consumerKey = "2UBwrhKMuLRvKxBw1dwCfJfs2"  
-consumerSecret = "dWnVwl593uB9RyJsCScCRePY6yv6Ogs6lfSqguGOLGcEgiEl3X"
-accessToken = "1231894513439756289-miuF5QtVJ3o1sQXHMdTElx7UuldNKk"
-accessSecret = "0afZHGFHvGER56QNVxjZK4jSkEgefpmghS79RGf3Pm4Ka"
+```{r setup, eval = T, echo = F}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+devtools::load_all()
+consumerKey = "1T4rV8alrjEWBlB5usHOpSb51"  
+consumerSecret = "lJbewuKftOqiBCYxCwKPWpw2G5ymUFLlj26W6LVmvRfN6Esra8"
+accessToken = "944082944515117056-Pn1BNVdu71WYzPLl6Lwrc2EH64pZkGN"
+# Bearer Token AAAAAAAAAAAAAAAAAAAAAOC3JgEAAAAAbRtOTX22%2BAtcnNchiIBWKifS1VE%3D0QWyKsvEgzLzX1ZuYFvaSQmrUwzyVrWuFHKfpO4plFQEH9D1d0
+accessSecret = "767F2b6l76d7g7yPf6bUl9j8li0ssjK8lo1UhyxbVDSyu"
 options(httr_oauth_cache=TRUE)
-setup_twitter_oauth(consumer_key = consumerKey, consumer_secret = consumerSecret,
-                    access_token = accessToken, access_secret = accessSecret)
+rtweet::create_token(app = "Data God",
+             consumer_key = consumerKey, consumer_secret = consumerSecret, access_token = accessToken, access_secret = accessSecret)
+library(twitterSentiment)
+library(rtweet)
+library(tidyverse)
+library(hrbrthemes)
+library(emo)
+library(qdapRegex)
+library(wordcloud2)
+library(tm)
+library(ggbeeswarm)
+library(extrafont)
+library(igraph)
+library(visNetwork)
+#danfaltesek
 ```
 
 ## Scraping the data
 
+```{r, echo = F}
+user_tweets("realDonaldTrump", n = 3200)
+search_hashtag("RStats", n = 3200)
+```
+
+## Tweets at a user
+
+```{r, echo = F}
+tweets_at_donald <- search_tweets("@realDonaldTrump exclude:retweets", n = 3200)
+```
+
+## Making a Wordcloud
+
+```{r, echo = F}
+tweets_to_wordcloud("realDonaldTrump")
+```
+
+## Number of tweets by Donald
+```{r, echo = F}
+number_tweets("realDonaldTrump")
+```
+
+## Remarkably consistent tweet lengths
+
+```{r, echo = F}
+tweet_length("realDonaldTrump")
+```
+
+## Emoji usage (he barely uses them)
+
+```{r, echo = F}
+tweet_emojis("realDonaldTrump")
+```
+
+## Most common emoji
+
+```{r echo=F, message=FALSE, warning=FALSE}
+# tweet_emoji <- the_tweets %>% 
+#   pull(text) %>% 
+#   str_extract_all(emo::ji_rx) %>% 
+#   flatten_chr() %>% 
+#   table() %>% 
+#   enframe(name = "emoji") %>% 
+#   left_join( emo::jis, by = "emoji" ) %>%
+#   mutate(code = tolower(runes)) %>%
+#   mutate(emoji_name = gsub(" ", "-", name)) %>%
+#   arrange( desc(value) )
+# 
+# # emoji as factor
+# tweet_emoji$name <- factor(tweet_emoji$name, levels = tweet_emoji$name[order(-tweet_emoji$value)])
+# tweet_emoji <- tweet_emoji %>%
+#   mutate(emoji_image = paste(emoji_name, "_", code, ".png", sep = ""))
+# tweet_emoji <- tweet_emoji %>%
+#   mutate(emoji_url = paste('https://emojipedia-us.s3.amazonaws.com/thumbs/240/apple/118/', emoji_image, sep = ""))
+# 
+# 
+# df.plot <- top_n(tweet_emoji, 15, value)
+# g <- lapply(df.plot$emoji_url, grid::rasterGrob)
+# 
+# # write_rds(df.plot, here::here("data/df.plot"))
+# 
+# df.plot %>% 
+#   plotly::plot_ly(y = df.plot$value, x = df.plot$name) %>%
+#   plotly::add_text(
+#     text = ~emoji,
+#     hovertext = ~name,
+#     hoverinfo = "text",
+#     size = I(20)
+#   )
+tweet_emoji_chart("realDonaldTrump")
+```
+
+
 ```{r}
+## search for #rstats tweets
+  rstats <- search_tweets("#rstats", n = 1000)
+
+  ## create from-to data frame representing retweet/mention/reply connections
+  rstats_net <- network_data(rstats, "retweet,mention,reply")
+  rstats_net <- network_graph(rstats)
+  plot(rstats_net)
 
 ```
 
