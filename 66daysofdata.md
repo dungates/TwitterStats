@@ -15,7 +15,7 @@ previous 59 days we get about ~6000 total tweets including retweets, or
 
 ## Wordcloud of Data
 
-![](/Users/dunk/Downloads/66daysofdata.png)
+![](images/66daysofdata.png)
 
 ## User Retweet Network
 

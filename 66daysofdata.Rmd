@@ -35,7 +35,7 @@ daysofdata %>% count(day = lubridate::floor_date(created_at, "day")) %>%
 
 ## Wordcloud of Data
 
-![](/Users/dunk/Downloads/66daysofdata.png)
+![](images/66daysofdata.png)
 
 
 ## User Retweet Network
